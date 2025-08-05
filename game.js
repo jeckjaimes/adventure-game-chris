@@ -5,7 +5,7 @@ const statusElement = document.getElementById("status");
 
 // Game state
 let gameState = {
-  currentLevel: 5,
+  currentLevel: 1,
   totalLevels: 5,
   gameWon: false,
   collectedItems: [],
