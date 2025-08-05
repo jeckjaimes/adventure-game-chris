@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zelda-Style Adventure Game</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: "Arial", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
+      }
+
+      .game-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        max-width: 100%;
+        overflow-x: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      canvas {
+        border: 3px solid #333;
+        border-radius: 5px;
+        background: #87ceeb;
+        height: auto;
+        display: block;
+      }
+
+      .instructions {
+        color: white;
+        text-align: center;
+        margin-top: 20px;
+        max-width: 600px;
+      }
+
+      .status {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+      }
+
+      .modal-content {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        margin: 50px auto;
+        padding: 40px;
+        border-radius: 20px;
+        width: 400px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        animation: modalSlideIn 0.5s ease-out;
+        border: 3px solid #fff;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          transform: translateY(-100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal h2 {
+        color: white;
+        font-size: 28px;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .modal p {
+        color: white;
+        font-size: 18px;
+        margin-bottom: 30px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-button {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        margin: 0 10px;
+      }
+
+      .modal-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-button.restart {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+      }
+
+      .modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      /* Question Modal Styles */
+      .question-modal {
+        width: 600px;
+        max-width: 90vw;
+        max-height: 80vh;
+        overflow-y: auto;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        border: 3px solid #f39c12;
+      }
+
+      .question-header {
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f39c12;
+        padding-bottom: 15px;
+      }
+
+      .question-header h2 {
+        color: #f39c12;
+        font-size: 32px;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      }
+
+      .subtitle {
+        color: #ecf0f1;
+        font-size: 18px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .question-description {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #e74c3c;
+      }
+
+      .question-description p {
+        color: #ecf0f1;
+        font-size: 16px;
+        margin: 8px 0;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .question-text {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .question-text h3 {
+        color: #f39c12;
+        font-size: 24px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        margin: 0;
+      }
+
+      .question-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .option-button {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .option-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+      }
+
+      .timer {
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        background: rgba(231, 76, 60, 0.2);
+        border-radius: 8px;
+        border: 2px solid #e74c3c;
+      }
+
+      .timer span {
+        color: #e74c3c;
+        font-size: 18px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      .answer-result {
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+
+      .answer-result.correct {
+        background: rgba(46, 204, 113, 0.2);
+        border: 2px solid #2ecc71;
+      }
+
+      .answer-result.incorrect {
+        background: rgba(231, 76, 60, 0.2);
+        border: 2px solid #e74c3c;
+      }
+
+      .answer-result p {
+        color: #ecf0f1;
+        font-size: 16px;
+        margin: 10px 0;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      /* Responsive design for smaller screens */
+      @media (max-width: 900px) {
+        .game-container {
+          padding: 10px;
+          margin: 10px;
+        }
+
+        canvas {
+          width: 100%;
+          max-width: 800px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .game-container {
+          padding: 5px;
+        }
+
+        canvas {
+          border-width: 2px;
+        }
+
+        .question-modal {
+          width: 95vw;
+          margin: 5% auto;
+          padding: 20px;
+        }
+
+        .question-header h2 {
+          font-size: 24px;
+        }
+
+        .subtitle {
+          font-size: 14px;
+        }
+
+        .question-text h3 {
+          font-size: 18px;
+        }
+
+        .question-options {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .option-button {
+          padding: 12px 15px;
+          font-size: 14px;
+        }
+
+        .timer span {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <h1>🗡️ Zelda-Style Adventure Game 🛡️</h1> -->
+
+    <div class="game-container">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div class="status" id="status">Iniciando tu aventura...</div>
+    </div>
+
+    <!-- Game Completion Modal -->
+    <div id="gameCompletionModal" class="modal">
+      <div class="modal-content">
+        <h2>Tu viaje no termina aquí: El viento será tu siguiente desafío.</h2>
+        <div class="modal-buttons">
+          <button class="modal-button" onclick="closeModal()">Cerrar</button>
+          <button class="modal-button restart" onclick="restartGame()">
+            Reiniciar Juego
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!--  <div class="instructions">
+      <h3>🎮 How to Play:</h3>
+      <p>
+        Use the <strong>Arrow Keys</strong> or <strong>WASD</strong> to move
+        your character (Link-style hero)
+      </p>
+      <p>
+        🔍 <strong>Hidden Objects:</strong> Objects are hidden until you get
+        close to them (see the white circle around your character)
+      </p>
+      <p>
+        🎯 <strong>Objectives:</strong> Each level has different objectives and
+        hidden items to find
+      </p>
+      <p>
+        🚪 <strong>Progress:</strong> Complete objectives to advance to the next
+        level
+      </p>
+      <p>
+        📊 <strong>UI:</strong> Check the top-left for level info and collected
+        items
+      </p>
+      <p>
+        ⚔️ <strong>Monsters:</strong> Click on monsters in levels 4+ to defeat
+        them!
+      </p>
+      <br />
+      <h4>🏆 Levels:</h4>
+      <p><strong>Level 1:</strong> Find the hidden key and open the chest</p>
+      <p>
+        <strong>Level 2:</strong> Collect 3 hidden gems to unlock the portal
+      </p>
+      <p>
+        <strong>Level 3:</strong> Find the map piece, then locate the buried
+        treasure
+      </p>
+      <p>
+        <strong>Level 4:</strong> Collect 4 magical flowers to unlock the garden
+        gate. Defeat the monsters!
+      </p>
+      <p>
+        <strong>Level 5:</strong> Find the ancient scroll and golden crown to
+        unlock the throne. Defeat all monsters!
+      </p>
+    </div> -->
+
+    <script src="sprites.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
