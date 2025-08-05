@@ -5,7 +5,7 @@ const statusElement = document.getElementById("status");
 
 // Game state
 let gameState = {
-  currentLevel: 1,
+  currentLevel: 5,
   totalLevels: 5,
   gameWon: false,
   collectedItems: [],
@@ -1069,7 +1069,49 @@ gameLoop();
 // Modal functions
 function showGameCompletionModal() {
   const modal = document.getElementById("gameCompletionModal");
+  const modalContent = modal.querySelector(".modal-content");
+
+  // Add TikTok video to the completion modal
+  const tiktokVideo =
+    "https://www.tiktok.com/@redbullarabia/video/6768782491626048773?_r=1&_t=ZN-8yd70iondn4";
+
+  const updatedHTML = `
+    <h2>Tu viaje no termina aquí: El viento será tu siguiente desafío.</h2>
+    <h2>Feliz Cumpleaños, Bro. Este es tu regalo:</h2>
+    <div class="tiktok-video-container">
+      <blockquote class="tiktok-embed" cite="${tiktokVideo}" data-video-id="${tiktokVideo
+    .split("/")
+    .pop()}" style="max-width: 325px; min-width: 325px;">
+        <section>
+          <a target="_blank" href="${tiktokVideo}"></a>
+        </section>
+      </blockquote>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-button restart" onclick="restartGame()">
+        Reiniciar Juego
+      </button>
+    </div>
+  `;
+
+  modalContent.innerHTML = updatedHTML;
   modal.style.display = "block";
+
+  // Force TikTok embed script to re-initialize for the new content
+  // Remove existing TikTok script if it exists
+  const existingScript = document.querySelector(
+    'script[src="https://www.tiktok.com/embed.js"]'
+  );
+  if (existingScript) {
+    existingScript.remove();
+  }
+
+  // Re-add the TikTok embed script to force re-initialization
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = "https://www.tiktok.com/embed.js";
+  document.body.appendChild(script);
 }
 
 function closeModal() {
@@ -1198,6 +1240,29 @@ function showAnswerResult(isCorrect, question, isTimeUp = false) {
   let resultHTML = "";
 
   if (isCorrect) {
+    // Get TikTok video based on current level
+    let tiktokVideo = "";
+    switch (gameState.currentLevel) {
+      case 1:
+        tiktokVideo =
+          "https://www.tiktok.com/@cuttingedgeai8/video/7531203276151196941?_r=1&_t=ZN-8yd6p0lReEw";
+        break;
+      case 2:
+        tiktokVideo =
+          "https://www.tiktok.com/@yoestuveai/video/7519081291615079702?_r=1&_t=ZN-8yd6wPRCaiQ";
+        break;
+      case 3:
+        tiktokVideo =
+          "https://www.tiktok.com/@sophia0806449/video/7534289276280835342?_r=1&_t=ZN-8yd6xJEpMbW";
+        break;
+      case 4:
+        tiktokVideo =
+          "https://www.tiktok.com/@alnewton17/video/7529330139927203127?_r=1&_t=ZN-8yd6ypSV3J8";
+        break;
+      default:
+        tiktokVideo = "";
+    }
+
     resultHTML = `
       <div class="question-header">
         <h2>✅ ¡CORRECTO!</h2>
@@ -1207,6 +1272,16 @@ function showAnswerResult(isCorrect, question, isTimeUp = false) {
       <div class="answer-result correct">
         <p>🎉 ¡Excelente! Tu respuesta es correcta.</p>
         <p><strong>Cálculo:</strong> ${question.calculation}</p>
+      </div>
+      
+      <div class="tiktok-video-container">
+        <blockquote class="tiktok-embed" cite="${tiktokVideo}" data-video-id="${tiktokVideo
+      .split("/")
+      .pop()}" style="max-width: 325px; min-width: 325px;">
+          <section>
+            <a target="_blank" href="${tiktokVideo}"></a>
+          </section>
+        </blockquote>
       </div>
       
       <div class="modal-buttons">
@@ -1255,6 +1330,23 @@ function showAnswerResult(isCorrect, question, isTimeUp = false) {
   }
 
   modalContent.innerHTML = resultHTML;
+
+  // Force TikTok embed script to re-initialize for the new content
+  if (isCorrect) {
+    // Remove existing TikTok script if it exists
+    const existingScript = document.querySelector(
+      'script[src="https://www.tiktok.com/embed.js"]'
+    );
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Re-add the TikTok embed script to force re-initialization
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.tiktok.com/embed.js";
+    document.body.appendChild(script);
+  }
 }
 
 function proceedAfterQuestion() {
